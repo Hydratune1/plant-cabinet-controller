@@ -298,6 +298,17 @@ async function refreshAlerts() {
 }
 
 function renderAlerts(alerts) {
+    // Header badge reflects total server-side active count, ignoring dismissals.
+    const badge = document.getElementById("alerts-badge");
+    if (badge) {
+        if (alerts.length > 0) {
+            badge.textContent = String(alerts.length);
+            badge.classList.remove("hidden");
+        } else {
+            badge.classList.add("hidden");
+        }
+    }
+
     const banner = document.getElementById("alerts-banner");
     if (!banner) return;
     const dismissed = JSON.parse(sessionStorage.getItem("dismissedAlertIds") || "[]");

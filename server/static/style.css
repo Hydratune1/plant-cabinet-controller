@@ -53,6 +53,18 @@ h1 {
     font-size: 0.9rem;
 }
 
+.alerts-badge {
+    background: var(--status-crit);
+    color: #ffffff;
+    padding: 0.1rem 0.55rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    min-width: 20px;
+    text-align: center;
+    line-height: 1.4;
+}
+
 /* --- Sections --- */
 section { margin-bottom: 1.75rem; }
 

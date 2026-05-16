@@ -144,6 +144,39 @@ def insert_relay_event(
             )
 
 
+def insert_alert(
+    *,
+    condition: str,
+    severity: str,
+    message: str,
+    timestamp: str | None = None,
+) -> int:
+    """Insert an alert row and return its primary key."""
+    with connect() as conn:
+        if timestamp is None:
+            cur = conn.execute(
+                "INSERT INTO alerts (condition, severity, message) VALUES (?, ?, ?)",
+                (condition, severity, message),
+            )
+        else:
+            cur = conn.execute(
+                """INSERT INTO alerts (timestamp, condition, severity, message)
+                   VALUES (?, ?, ?, ?)""",
+                (timestamp, condition, severity, message),
+            )
+        return int(cur.lastrowid or 0)
+
+
+def resolve_alert(alert_id: int) -> None:
+    """Mark an alert as resolved (sets resolved_at to NOW; no-op if already resolved)."""
+    with connect() as conn:
+        conn.execute(
+            "UPDATE alerts SET resolved_at = datetime('now') "
+            "WHERE id = ? AND resolved_at IS NULL",
+            (alert_id,),
+        )
+
+
 def get_latest_reading() -> dict[str, Any] | None:
     """Return the most recent reading row as a dict, or None if the table is empty."""
     with connect() as conn:

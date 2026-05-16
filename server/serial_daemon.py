@@ -26,6 +26,7 @@ import serial  # pyserial
 
 import config
 import models
+from notifications import AlertMonitor
 
 logger = logging.getLogger(__name__)
 
@@ -51,6 +52,7 @@ class SerialDaemon:
         port: str = config.MCU_SERIAL_PORT,
         baud: int = config.MCU_BAUD_RATE,
         reconnect_delay_s: float = 5.0,
+        alert_monitor: AlertMonitor | None = None,
     ) -> None:
         self.port = port
         self.baud = baud
@@ -62,6 +64,7 @@ class SerialDaemon:
         self._stop = threading.Event()
         self._thread: threading.Thread | None = None
         self._serial: serial.Serial | None = None
+        self._alert_monitor = alert_monitor
 
     # --- Public API ---
 
@@ -202,6 +205,11 @@ class SerialDaemon:
             logger.exception("Failed to persist reading")
         with self._state_lock:
             self._state.reading = msg
+        if self._alert_monitor is not None:
+            try:
+                self._alert_monitor.check_reading(msg)
+            except Exception:
+                logger.exception("AlertMonitor.check_reading raised")
 
     def _handle_relay(self, msg: dict[str, Any]) -> None:
         # Diff against the previous snapshot so we only log true transitions.
@@ -240,7 +248,14 @@ class SerialDaemon:
             self._state.status = msg
 
     def _handle_error(self, msg: dict[str, Any]) -> None:
-        logger.warning("MCU error: %s — %s", msg.get("code"), msg.get("msg"))
+        code = msg.get("code", "")
+        text = msg.get("msg", "")
+        logger.warning("MCU error: %s — %s", code, text)
+        if self._alert_monitor is not None:
+            try:
+                self._alert_monitor.on_mcu_error(code, text)
+            except Exception:
+                logger.exception("AlertMonitor.on_mcu_error raised")
 
     def _handle_ack(self, msg: dict[str, Any]) -> None:
         if msg.get("success"):

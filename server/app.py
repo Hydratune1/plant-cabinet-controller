@@ -16,6 +16,12 @@ from flask import Blueprint, Flask, current_app, jsonify, render_template, reque
 
 import config
 import models
+from notifications import (
+    DEFAULT_COOLDOWN_S,
+    AlertMonitor,
+    NotificationManager,
+    rule_descriptors,
+)
 from serial_daemon import SerialDaemon
 
 logger = logging.getLogger(__name__)
@@ -323,6 +329,17 @@ def api_alerts_get():
     return jsonify({"alerts": alerts})
 
 
+@api_bp.get("/alerts/config")
+def api_alerts_config():
+    notifications: NotificationManager = current_app.config["notifications"]
+    return jsonify({
+        "thresholds":       dict(current_app.config["alert_thresholds"]),
+        "cooldown_seconds": int(notifications.cooldown_s),
+        "ifttt_configured": notifications.configured,
+        "rules":            rule_descriptors(),
+    })
+
+
 @api_bp.get("/config")
 def api_config_get():
     webhook = "***configured***" if config.IFTTT_WEBHOOK_KEY else "***not configured***"
@@ -393,9 +410,25 @@ def create_app() -> Flask:
 
     models.init_db()
 
-    daemon = SerialDaemon()
+    notifications = NotificationManager(
+        webhook_key=config.IFTTT_WEBHOOK_KEY,
+        cooldown_s=DEFAULT_COOLDOWN_S,
+    )
+    alert_monitor = AlertMonitor(
+        notifications=notifications,
+        thresholds_provider=lambda: app.config["alert_thresholds"],
+    )
+    alert_monitor.start()
+
+    daemon = SerialDaemon(alert_monitor=alert_monitor)
     daemon.start()
+
+    app.config["notifications"] = notifications
+    app.config["alert_monitor"] = alert_monitor
     app.config["serial_daemon"] = daemon
+
+    # Register reverse-order: daemon stops first, monitor second.
+    atexit.register(alert_monitor.stop)
     atexit.register(daemon.stop)
 
     @app.route("/")
