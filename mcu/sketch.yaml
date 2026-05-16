@@ -1,0 +1,6 @@
+# Arduino CLI project configuration for the Uno Q MCU (STM32U585)
+# Build with: arduino-cli compile --fqbn arduino:stm32:uno_q mcu/
+# Upload with: arduino-cli upload --fqbn arduino:stm32:uno_q -p <port> mcu/
+
+default_fqbn: arduino:stm32:uno_q
+default_port: auto
