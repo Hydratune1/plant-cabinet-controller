@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plant Cabinet Controller</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div id="alerts-banner" class="alerts-banner hidden"></div>
+
+<header>
+    <h1>Plant Cabinet</h1>
+    <div class="status-indicator">
+        <span id="connection-dot" class="dot"></span>
+        <span id="connection-text">Connecting…</span>
+    </div>
+</header>
+
+<main>
+
+    <section id="sensors">
+        <h2>Environment</h2>
+        <div class="card-grid">
+            <div class="card sensor" data-sensor="temperature">
+                <div class="label">Temperature</div>
+                <div><span class="value">–</span><span class="unit">°C</span></div>
+            </div>
+            <div class="card sensor" data-sensor="humidity">
+                <div class="label">Humidity</div>
+                <div><span class="value">–</span><span class="unit">% RH</span></div>
+            </div>
+            <div class="card sensor" data-sensor="co2">
+                <div class="label">CO₂</div>
+                <div><span class="value">–</span><span class="unit">ppm</span></div>
+            </div>
+            <div class="card sensor" data-sensor="pressure">
+                <div class="label">Pressure</div>
+                <div><span class="value">–</span><span class="unit">hPa</span></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="relays">
+        <h2>Actuators</h2>
+        <div class="card-grid">
+            <div class="card relay" data-relay="humidifier">
+                <div class="relay-header"><span class="dot off"></span><span>Humidifier</span></div>
+                <div class="state-text">–</div>
+                <div class="mode-toggle" role="radiogroup" aria-label="Humidifier mode">
+                    <button type="button" data-mode="auto">Auto</button>
+                    <button type="button" data-mode="manual_on">On</button>
+                    <button type="button" data-mode="manual_off">Off</button>
+                </div>
+            </div>
+            <div class="card relay" data-relay="fan">
+                <div class="relay-header"><span class="dot off"></span><span>Fan</span></div>
+                <div class="state-text">–</div>
+                <div class="mode-toggle" role="radiogroup" aria-label="Fan mode">
+                    <button type="button" data-mode="auto">Auto</button>
+                    <button type="button" data-mode="manual_on">On</button>
+                    <button type="button" data-mode="manual_off">Off</button>
+                </div>
+            </div>
+            <div class="card relay" data-relay="heater">
+                <div class="relay-header"><span class="dot off"></span><span>Heater</span></div>
+                <div class="state-text">–</div>
+                <div class="mode-toggle" role="radiogroup" aria-label="Heater mode">
+                    <button type="button" data-mode="auto">Auto</button>
+                    <button type="button" data-mode="manual_on">On</button>
+                    <button type="button" data-mode="manual_off">Off</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="setpoints">
+        <h2>Setpoints</h2>
+        <div class="setpoint-group">
+            <label for="sp-temp">Temperature <span class="value" id="sp-temp-value">–</span></label>
+            <input type="range" id="sp-temp" min="18" max="25" step="0.1" value="22">
+        </div>
+        <div class="setpoint-group">
+            <label for="sp-hum">Humidity <span class="value" id="sp-hum-value">–</span></label>
+            <input type="range" id="sp-hum" min="60" max="80" step="1" value="70">
+        </div>
+        <div class="setpoint-group">
+            <label for="sp-co2">CO₂ <span class="value" id="sp-co2-value">–</span></label>
+            <input type="range" id="sp-co2" min="400" max="1000" step="10" value="600">
+        </div>
+    </section>
+
+    <section id="charts">
+        <h2>History</h2>
+        <div class="chart-tabs" role="tablist">
+            <button type="button" data-period="1h">1H</button>
+            <button type="button" data-period="6h">6H</button>
+            <button type="button" data-period="24h" class="active">24H</button>
+            <button type="button" data-period="7d">7D</button>
+        </div>
+        <div class="chart-wrap"><canvas id="chart-temp-hum"></canvas></div>
+        <div class="chart-wrap"><canvas id="chart-co2"></canvas></div>
+    </section>
+
+</main>
+
+<footer id="system">
+    <div class="system-item">MCU state <span class="value" id="sys-mcu-state">–</span></div>
+    <div class="system-item">MCU uptime <span class="value" id="sys-mcu-uptime">–</span></div>
+    <div class="system-item">Server uptime <span class="value" id="sys-server-uptime">–</span></div>
+    <div class="system-item">Firmware <span class="value" id="sys-firmware">–</span></div>
+    <div class="system-item">DB size <span class="value" id="sys-db-size">–</span></div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+
+</body>
+</html>
