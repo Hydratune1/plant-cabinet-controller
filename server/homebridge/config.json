@@ -1,0 +1,91 @@
+{
+    "bridge": {
+        "name": "Plant Cabinet",
+        "username": "CC:22:3D:E3:CE:01",
+        "port": 51826,
+        "pin": "031-45-154",
+        "manufacturer": "Hydratune",
+        "model": "Plant Cabinet Controller"
+    },
+
+    "accessories": [
+        {
+            "accessory": "HTTP-TEMPERATURE",
+            "name": "Cabinet Temperature",
+            "getUrl": "http://localhost:5000/api/readings",
+            "statusPattern": "\"temperature_c\":\\s*(-?[0-9.]+)",
+            "patternGroupToExtract": 1,
+            "pullInterval": 30000
+        },
+        {
+            "accessory": "HTTP-HUMIDITY",
+            "name": "Cabinet Humidity",
+            "getUrl": "http://localhost:5000/api/readings",
+            "statusPattern": "\"humidity_rh\":\\s*(-?[0-9.]+)",
+            "patternGroupToExtract": 1,
+            "pullInterval": 30000
+        },
+        {
+            "accessory": "HTTP-SWITCH",
+            "name": "Cabinet Humidifier",
+            "switchType": "stateful",
+            "onUrl": {
+                "url": "http://localhost:5000/api/relays",
+                "method": "POST",
+                "headers": { "Content-Type": "application/json" },
+                "body": "{\"target\":\"humidifier\",\"mode\":\"manual_on\"}"
+            },
+            "offUrl": {
+                "url": "http://localhost:5000/api/relays",
+                "method": "POST",
+                "headers": { "Content-Type": "application/json" },
+                "body": "{\"target\":\"humidifier\",\"mode\":\"manual_off\"}"
+            },
+            "statusUrl": "http://localhost:5000/api/relays",
+            "statusPattern": "\"humidifier\":\\s*\\{[^}]*\"state\":\\s*true",
+            "pullInterval": 30000
+        },
+        {
+            "accessory": "HTTP-SWITCH",
+            "name": "Cabinet Fan",
+            "switchType": "stateful",
+            "onUrl": {
+                "url": "http://localhost:5000/api/relays",
+                "method": "POST",
+                "headers": { "Content-Type": "application/json" },
+                "body": "{\"target\":\"fan\",\"mode\":\"manual_on\"}"
+            },
+            "offUrl": {
+                "url": "http://localhost:5000/api/relays",
+                "method": "POST",
+                "headers": { "Content-Type": "application/json" },
+                "body": "{\"target\":\"fan\",\"mode\":\"manual_off\"}"
+            },
+            "statusUrl": "http://localhost:5000/api/relays",
+            "statusPattern": "\"fan\":\\s*\\{[^}]*\"state\":\\s*true",
+            "pullInterval": 30000
+        },
+        {
+            "accessory": "HTTP-SWITCH",
+            "name": "Cabinet Heater",
+            "switchType": "stateful",
+            "onUrl": {
+                "url": "http://localhost:5000/api/relays",
+                "method": "POST",
+                "headers": { "Content-Type": "application/json" },
+                "body": "{\"target\":\"heater\",\"mode\":\"manual_on\"}"
+            },
+            "offUrl": {
+                "url": "http://localhost:5000/api/relays",
+                "method": "POST",
+                "headers": { "Content-Type": "application/json" },
+                "body": "{\"target\":\"heater\",\"mode\":\"manual_off\"}"
+            },
+            "statusUrl": "http://localhost:5000/api/relays",
+            "statusPattern": "\"heater\":\\s*\\{[^}]*\"state\":\\s*true",
+            "pullInterval": 30000
+        }
+    ],
+
+    "platforms": []
+}

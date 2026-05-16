@@ -37,17 +37,15 @@
 
 ## Homebridge (HomeKit)
 
-1. Install Node.js and Homebridge on the Linux side:
-   ```bash
-   sudo apt install nodejs npm
-   sudo npm install -g homebridge
-   ```
-2. Install the HTTP plugin:
-   ```bash
-   sudo npm install -g homebridge-http-temperature-sensor
-   ```
-3. Configure Homebridge to point at the Flask API endpoints
-4. Pair with Apple Home using the setup code shown in Homebridge logs
+See [`homebridge-setup.md`](homebridge-setup.md) for the full step-by-step:
+Node.js install, plugin install, config deployment, pairing, and the systemd
+unit. The ready-to-use Homebridge config lives at
+`server/homebridge/config.json`, and `server/homebridge/co2_quality.py`
+holds the CO2 -> HomeKit AirQuality (1-5) mapping for the optional air-quality
+accessory.
+
+No new Python dependencies are required — `co2_quality.py` only uses the
+standard library (`urllib`, `argparse`, `json`).
 
 ## IFTTT
 
